@@ -1,0 +1,18 @@
+---
+- hosts: ub2srv
+  become: true
+  roles:
+    - apache
+    - php
+    - nginx
+    - zabbix_agent
+    - bind9
+    - postfix
+    - dovecot
+    - filebeat
+- hosts: cnt3srv
+  become: true
+  roles:
+    - postgresql
+    - zabbix_agent
+    - elasticsearch

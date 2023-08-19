@@ -1,0 +1,19 @@
+---
+# tasks file for bind9
+- name: Install BIND9
+  apt:
+    name: bind9
+    state: latest
+
+- name: Configure BIND9
+  template:
+    src: templates/named.conf.j2
+    dest: /etc/bind/named.conf
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Enable BIND9 service
+  systemd:
+    name: bind9
+    enabled: yes

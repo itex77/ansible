@@ -1,0 +1,14 @@
+---
+# tasks file for postgresql-12
+- name: Add PostgreSQL 12 Repository
+  become: yes
+  yum:
+    name: https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+    state: present
+
+- name: Install PostgreSQL 12
+  become: yes
+  yum:
+    name: postgresql12-server
+    enablerepo: "pgdg12"
+    state: present

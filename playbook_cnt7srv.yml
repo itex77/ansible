@@ -1,0 +1,7 @@
+---
+- name: Configure cnt3srv server
+  hosts: cnt3srv
+  become: yes
+  roles:
+    - postgresql-12
+    - elasticsearch

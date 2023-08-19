@@ -1,0 +1,13 @@
+---
+# tasks file for php
+- name: Install PHP7.4 and extensions
+  become: yes
+  apt:
+    update_cache: yes
+    pkg: 
+    - php7.4
+    - php7.4-cli
+    - php7.4-common
+    - php7.4-mysql
+    - php7.4-curl
+    state: present

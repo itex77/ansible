@@ -1,0 +1,7 @@
+---
+# handlers file for zabbix-agent
+- name: zabbix-agent systemd
+  systemd:
+          name: zabbix-agent.service
+          enabled: yes
+          state: started

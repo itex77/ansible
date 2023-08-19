@@ -1,0 +1,11 @@
+---
+# tasks file for apach
+- name: Install Apache
+  apt:
+    name: apache2
+    state: latest
+
+- name: Enable Apache service
+  systemd:
+    name: apache2
+    enabled: yes

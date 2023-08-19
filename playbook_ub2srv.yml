@@ -1,0 +1,12 @@
+---
+- name: Configure ub2srv server
+  hosts: ub2srv
+  become: yes
+  roles:
+    - apache
+    - php
+    - nginx
+    - bind9
+    - postfix
+    - dovecot
+    - filebeat

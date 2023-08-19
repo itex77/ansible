@@ -1,0 +1,7 @@
+---
+# handlers file for deploy_services_on_other_servers
+- name: zabbix-agent systemd
+  systemd:
+          name: zabbix-agent.service
+          enabled: yes
+          state: started

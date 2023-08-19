@@ -1,0 +1,41 @@
+---
+# tasks file for deploy_zabbix-agent_on_hosts
+- block: #=======Block for Debian======
+    - name: Скачивание репозитория Zabbix
+      get_url: 
+        url: https://repo.zabbix.com/zabbix/4.0/ubuntu/pool/main/z/zabbix-release/zabbix-release_4.0-3+focal_all.deb
+        dest: /tmp/zabbix-release_4.0-3+focal_all.deb
+
+    - name: Установка репозитория Zabbix
+      apt: 
+        deb: /tmp/zabbix-release_4.0-3+focal_all.deb
+
+    - name: Обновление списка пакетов
+      apt:
+        update_cache: yes
+    
+    - name: Установка Zabbix-agent
+      apt:
+        name: zabbix-agent
+        state: latest
+
+    - name: Запуск службы Zabbix-agent
+      systemd:
+        name: zabbix-agent
+        state: started
+        enabled: yes
+  when: ansible_os_family == "Debian"
+
+- block: # ========Block for RedHat======
+  - name: Install zabbix-agent on RedHat Family
+    ansible.builtin.yum:
+            name: zabbix-agent
+            state: latest
+
+  - name: Start and enable service zabbix-agent
+    ansible.builtin.service:
+            name: zabbix-agent
+            state: started
+            enabled: yes
+
+  when: ansible_os_family == "RedHat"

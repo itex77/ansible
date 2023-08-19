@@ -1,0 +1,23 @@
+---
+# tasks file for elasticsearch
+- name: Install wget
+  become: true
+  yum:
+    name: wget
+    state: present
+
+- name: Download elasticsearch.deb
+  command: wget https://www.techplanet.pro/d/elasticsearch-7.17.1-amd64.deb
+
+- name: Install elasticsearch from .deb
+  become: true
+  apt:
+    deb: elasticsearch-7.17.1-amd64.deb
+    state: present
+
+- name: Start and enable elasticsearch
+  become: true
+  systemd:
+    name: elasticsearch
+    state: started
+    enabled: true

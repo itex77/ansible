@@ -1,0 +1,19 @@
+---
+# tasks file for postfix
+- name: Install Postfix
+  apt:
+    name: postfix
+    state: latest
+
+- name: Configure Postfix
+  template:
+    src: templates/main.cf.j2
+    dest: /etc/postfix/main.cf
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Enable Postfix service
+  systemd:
+    name: postfix
+    enabled: yes
