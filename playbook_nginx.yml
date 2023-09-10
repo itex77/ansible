@@ -1,0 +1,6 @@
+---
+- hosts: web 
+  become: yes
+
+  roles:
+          - { role: nginx, when: ansible_system == 'Linux' }

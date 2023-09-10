@@ -1,14 +1,44 @@
 ---
-# tasks file for postgresql-12
-- name: Add PostgreSQL 12 Repository
-  become: yes
-  yum:
-    name: https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm
-    state: present
+ - name: install repo for PostgreSQL 12
+   yum:
+          name: https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+          state: present
 
-- name: Install PostgreSQL 12
-  become: yes
-  yum:
-    name: postgresql12-server
-    enablerepo: "pgdg12"
-    state: present
+ - name: Install PostgreSQL-12
+   yum:
+          name:
+                  - postgresql12-server
+                  - postgresql12-contrib
+                  - postgresql12-devel
+   become: true
+
+ - name: Initialize PostgreSQL database cluster
+   become: true
+   shell: /usr/pgsql-12/bin/postgresql-12-setup initdb
+
+ - name: Start and enable PostgreSQL service
+   become: true
+   service:
+          name: postgresql-12
+          state: started
+          enabled: true
+
+ - name: Set password for PostgreSQL superuser
+   become: true
+   shell: /usr/pgsql-12/bin/psql -c "ALTER USER postgres WITH PASSWORD 'Lbgkjv2123'"
+   vars:
+          postgres_password: "Lbgkjv2123"
+
+ - name: Update pg_hba.conf to allow remote connections
+   become: true
+   template:
+          src: postgresql.conf.j2
+          dest: /var/lib/pgsql/12/data/pg_hba.conf
+          notify: restart postgresql
+
+ - name: Restart PostgreSQL service
+   become: true
+   service:
+          name: postgresql-12
+          state: restarted
+

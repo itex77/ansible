@@ -1,0 +1,6 @@
+---
+- hosts: bd 
+  become: yes
+
+  roles:
+          - { role: postgresql-12, when: ansible_system == 'Linux' }
