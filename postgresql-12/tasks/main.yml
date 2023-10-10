@@ -1,31 +1,59 @@
 ---
- - name: install repo for PostgreSQL 12
-   yum:
-          name: https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm
-          state: present
+ - name: test to see if selinux is running
+   command: getenforce
+   register: sestatus
+   changed_when: false
 
- - name: Install PostgreSQL-12
+ - name: install repo for PostgreSQL 12
+   dnf:
+          name: https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm 
+          state: present
+   become: yes       
+  
+ - name: install epel et autres
    yum:
           name:
-                  - postgresql12-server
-                  - postgresql12-contrib
-                  - postgresql12-devel
-   become: true
+                  - epel-release
+                  - yum-utils
+          state: present
 
- - name: Initialize PostgreSQL database cluster
-   become: true
-   shell: /usr/pgsql-12/bin/postgresql-12-setup initdb
+ - name: enable config-manager
+   command: yum-config-manager --enable pgdg12  
 
- - name: Start and enable PostgreSQL service
+ - name: install postgresql12
+   yum:
+           name:
+                   - postgresql-server
+           state: present          
+
+ - name: Check if PostgreSQL is initialized
+   ansible.builtin.stat:
+           path: "{{ postgresql_data_dir }}/pg_hba.conf"
+   register: postgres_data
+      
+ - name: Empty data dir
+   ansible.builtin.file:
+           path: "{{ postgresql_data_dir }}"
+           state: absent
+   when: not postgres_data.stat.exists
+ 
+ - name: Initialize PostgreSQL
+   ansible.builtin.shell: "{{ postgresql_bin_path }}/initdb -D {{ postgresql_data_dir }}"
    become: true
-   service:
-          name: postgresql-12
-          state: started
-          enabled: true
+   become_user: postgres
+   vars_files:
+           - vars/main.yml
+   when: not postgres_data.stat.exists
+
+ - name: Start and enable service
+   ansible.builtin.service:
+           name: postgresql
+           state: started
+           enabled: true
 
  - name: Set password for PostgreSQL superuser
    become: true
-   shell: /usr/pgsql-12/bin/psql -c "ALTER USER postgres WITH PASSWORD 'Lbgkjv2123'"
+   shell: /usr/bin/postgres -c "ALTER USER postgres WITH PASSWORD 'Lbgkjv2123'"
    vars:
           postgres_password: "Lbgkjv2123"
 
@@ -33,12 +61,12 @@
    become: true
    template:
           src: postgresql.conf.j2
-          dest: /var/lib/pgsql/12/data/pg_hba.conf
+          dest: /var/lib/pgsql/data/pg_hba.conf
           notify: restart postgresql
 
  - name: Restart PostgreSQL service
    become: true
    service:
-          name: postgresql-12
+          name: postgresql
           state: restarted
 
