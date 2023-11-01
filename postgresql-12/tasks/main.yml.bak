@@ -1,0 +1,76 @@
+---
+ - name: test to see if selinux is running
+   command: getenforce
+   register: sestatus
+   changed_when: false
+
+ - name: install repo for PostgreSQL 12
+   dnf:
+          name: https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+          state: present
+   become: yes
+
+ - name: install postgresql12
+   dnf:
+           name:
+                   - postgresql-server
+                   - postgresql-contrib.x86_64
+                   - python3-psycopg2.x86_64           
+           state: present
+
+ - name: Find out if PostgreSQL is initialized
+   stat:
+           path: /var/lib/pgsql/data/pg_hba.conf
+   register: postgres_data
+ 
+ - name: Initialize PostgreSQL
+   command: postgresql-setup initdb
+   when: not postgres_data.stat.exists
+
+ - name: Start and enable services
+   service: "name={{ item }} state=started enabled=yes"
+   with_items:
+           - postgresql
+
+ - name: Set password for PostgreSQL superuser
+   postgresql_user:
+           db: postgres
+           name: postgres
+           password: "{{ postgres_password }}"
+   become_user: postgres
+
+ - name: Update pg_hba.conf to allow remote connections
+   become: true
+   template:
+          src: postgresql.conf.j2
+          dest: /var/lib/pgsql/data/pg_hba.conf
+          notify: restart postgresql
+
+ - name: Restart PostgreSQL service
+   become: true
+   service:
+          name: postgresql
+          state: restarted 
+
+
+ - name: Copy configuration file from remote server
+   template:
+           src: /192.168.88.223/home/itex/ansible/postgresql-12/templates/postgresql.conf.j2
+           dest: template/postgresql.conf.j2
+           owner: root
+           group: root
+           mode: '0644'
+           remote_src: yes
+
+ - name: Update pg_hba.conf to allow remote connections
+   become: true
+   template:
+           src: postgresql.conf.j2
+           dest: /var/lib/pgsql/data/pg_hba.conf
+           notify: restart postgresql
+
+ - name: Restart PostgreSQL service
+   become: true
+   service:
+           name: postgresql
+           state: restarted           

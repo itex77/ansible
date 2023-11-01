@@ -1,2 +1,6 @@
 ---
 # handlers file for postgresql-12
+ - name: restart postgresql 
+   service:
+           name: postgresql
+           state: restarted

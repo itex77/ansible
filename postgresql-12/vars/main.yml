@@ -1,2 +1,5 @@
 ---
 # vars file for postgresql-12
+postgresql_conf_path: /var/lib/pgsql/data
+postgres_password: "Lbgkjv2123" 
+#db_name: app1 

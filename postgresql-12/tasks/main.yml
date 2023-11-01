@@ -1,31 +1,7 @@
 ---
- - name: test to see if selinux is running
-   command: getenforce
-   register: sestatus
-   changed_when: false
+# file: //postgresql-12/tasks/main.yml -- root task with pre-flight check and which includes other
 
- - name: install repo for PostgreSQL 12
-   dnf:
-          name: https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm
-          state: present
-   become: yes
-
- - name: install postgresql12
-   dnf:
-           name:
-                   - postgresql-server
-           state: present
-
- - name: Find out if PostgreSQL is initialized
-   stat:
-           path: /var/lib/pgsql/data/pg_hba.conf
-   register: postgres_data
- 
- - name: Initialize PostgreSQL
-   command: postgresql-setup initdb
-   when: not postgres_data.stat.exists
-
- - name: Start and enable services
-   service: "name={{ item }} state=started enabled=yes"
-   with_items:
-           - postgresql           
+#- include: install.yml
+- include: configure.yml
+  #- include: users.yml
+  #- include: databases.yml
