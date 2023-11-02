@@ -1,27 +1,26 @@
 ---
- - name: Set password for PostgreSQL superuser
-   postgresql_user:
-           db: postgres
-           name: postgres
-           password: "{{ postgres_password }}"
-   no_log: true
-   become_user: postgres
-
  - name: Update pg_hba.conf to allow remote connections
    become: true
    template:
            src: pg_hba.conf.j2
            dest: /var/lib/pgsql/data/pg_hba.conf
+           owner: root
+           group: root
+           mode: 0644
    notify: restart postgresql
 
  - name: Update postgresql.conf to allow remote connections
+   become: true
    template:
-           src: postgresql.conf.j2 
+           src: postgresql.conf.j2
            dest: /var/lib/pgsql/data/postgresql.conf
-   state: present
+           owner: root
+           group: root
+           mode: 0644
+   notify: restart postgresql
 
  - name: Restart PostgreSQL service
    become: true
    service:
           name: postgresql
-          state: restarted 
+          state: restarted

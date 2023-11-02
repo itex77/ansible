@@ -1,0 +1,8 @@
+---
+ - name: Set password for PostgreSQL superuser
+   postgresql_user:
+           db: postgres
+           name: postgres
+           password: "{{ postgres_password }}"
+   no_log: true
+   become_user: postgres

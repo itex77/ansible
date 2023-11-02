@@ -1,7 +1,7 @@
 ---
 # file: //postgresql-12/tasks/main.yml -- root task with pre-flight check and which includes other
 
-#- include: install.yml
+- include: install.yml
 - include: configure.yml
-  #- include: users.yml
+- include: users.yml
   #- include: databases.yml
